@@ -20,7 +20,7 @@ import de.seuhd.campuscoffee.domain.exceptions.DuplicationException;
 
 
 /**
- * Unit and integration tests for the operations related to POS (Point of Sale).
+ * Unit and integration tests for the operations related to Crud Service
  */
 @ExtendWith(MockitoExtension.class)
 public class CrudServiceTest {
