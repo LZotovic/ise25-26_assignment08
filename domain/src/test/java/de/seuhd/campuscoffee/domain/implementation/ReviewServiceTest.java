@@ -6,6 +6,7 @@ import de.seuhd.campuscoffee.domain.exceptions.ValidationException;
 import de.seuhd.campuscoffee.domain.model.objects.Pos;
 import de.seuhd.campuscoffee.domain.model.objects.Review;
 import de.seuhd.campuscoffee.domain.model.objects.User;
+import de.seuhd.campuscoffee.domain.ports.data.CrudDataService;
 import de.seuhd.campuscoffee.domain.ports.data.PosDataService;
 import de.seuhd.campuscoffee.domain.ports.data.ReviewDataService;
 import de.seuhd.campuscoffee.domain.ports.data.UserDataService;
@@ -155,22 +156,44 @@ public class ReviewServiceTest {
                 .approvalCount(2)
                 .approved(false)
                 .build();
-        
+
         // when
         Review updatedReview = reviewService.updateApprovalStatus(unapprovedReview);
-        
+
         // then
         assertFalse(updatedReview.approved());
-        
+
         // when
         Review approvedReview = unapprovedReview.toBuilder()
                 .approvalCount(approvalConfiguration.minCount())
                 .build();
-        
+
         // when
         updatedReview = reviewService.updateApprovalStatus(approvedReview);
-        
+
         // then
         assertTrue(updatedReview.approved());
     }
+
+    // Implementing tests for 80% coverage
+    @Test
+    void testApprovalStatusNotReachApprovalQuorum() {
+        // given
+        Review review = TestFixtures.getReviewFixtures().getFirst().toBuilder()
+                .approvalCount(approvalConfiguration.minCount()-2)
+                .approved(false)
+                .build();
+        User user = TestFixtures.getUserFixtures().getLast();
+        when(userDataService.getById(user.getId())).thenReturn(user);
+        when(reviewDataService.getById(review.getId())).thenReturn(review);
+        when(reviewDataService.upsert(any(Review.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+
+        //when
+        Review result = reviewService.approve(review, user.getId());
+        // then
+        assertFalse(result.approved());
+    }
+
+
 }
