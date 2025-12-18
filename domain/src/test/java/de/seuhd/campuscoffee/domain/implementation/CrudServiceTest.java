@@ -152,7 +152,7 @@ public class CrudServiceTest {
 
     @Test
     void deleteEntityNotFound() {
-        doThrow(new NotFoundException(Review.class, "id", "99"))
+        doThrow(new NotFoundException(Review.class, "id", "102"))
                 .when(crudDataService).delete(102L);
 
         assertThrows(NotFoundException.class,
